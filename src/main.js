@@ -1,7 +1,9 @@
 import Vue from 'vue'
-import App from './App.vue'
+import AutoComplete from './AutoComplete.vue'
 
 new Vue({
   el: '#app',
-  render: h => h(App)
+  components:{
+    "vue-v-autocomplete":AutoComplete
+  }
 })
