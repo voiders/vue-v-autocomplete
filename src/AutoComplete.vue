@@ -23,10 +23,12 @@ export default {
 			default : 3
 		},
 		'data':{
-			type: Array
+			type: Array,
+			default:  () => []
 		},
 		'indexes':{
-			type: Array
+			type: Array,
+			default:  () => []
 		},
 		'url':{
 			type: String
@@ -106,7 +108,7 @@ export default {
 				this.$emit('update:refitem',item[this["responseKey"]]);
 
 			}else{
-				this.$emit('update:refitem', JSON.parse(JSON.stringify(item)));
+				this.$emit('update:refitem',JSON.parse(JSON.stringify(item)));
 
 			}
 
@@ -132,7 +134,7 @@ export default {
 				}else{
 					this.selectedIndex=this.selectedIndex-1;
 				}
-				console.log(this.selectedIndex);
+				// console.log(this.selectedIndex);
 			}
 
 		},
@@ -143,7 +145,7 @@ export default {
 				}else{
 					this.selectedIndex=this.selectedIndex+1;
 				}
-				console.log(this.selectedIndex);
+				// console.log(this.selectedIndex);
 			}
 		},
 		outClick:  function(e){
@@ -221,11 +223,21 @@ export default {
 				call.then(
 					response =>{
 						if(scope["idKey"]){
-							scope.data = response.body[scope["idKey"]];
-
+							if(Object.prototype.toString.call(response.body[scope["idKey"]]) == '[object Array]'){
+								scope.data = response.body[scope["idKey"]];
+							}else{
+								scope.data = JSON.parse(response.body[scope["idKey"]]);
+							}
+							
 						}else{
-							scope.data = response.body;
+							if(Object.prototype.toString.call(response.body) == '[object Array]'){
+								scope.data = response.body;
+							}else{
+								scope.data = JSON.parse(response.body);
+							}
+
 						}
+						
 						scope.localSearch();
 						scope.showData = (scope.data.length > 0);
 					},
