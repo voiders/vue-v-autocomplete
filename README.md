@@ -2,6 +2,13 @@
 
 > A Vue.js project
 
+## Install
+
+``` bash
+
+npm install vue-v-autocomplete
+
+```
 ## Build Setup
 
 ``` bash
