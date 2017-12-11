@@ -23,18 +23,17 @@ export default {
 			default : 3
 		},
 		'data':{
-			type: Array,
-			default:new Array()
+			type: Array
 		},
 		'indexes':{
-			type: Array,
-			default : new Array()
+			type: Array
 		},
 		'url':{
 			type: String
 		},
 		'method':{
-			type: String
+			type: String,
+			default: 'get'
 		},
 		'id-key' : {
 			type: String
@@ -73,6 +72,10 @@ export default {
 		'class-ul':{
 			type: String,
 			default : ''
+		},
+		'json-file' : {
+			type: Boolean,
+			default: false
 		}
 	},
 	data: function(){
@@ -84,6 +87,7 @@ export default {
 			filter:'',
 			itemSelected: {},
 			originData:[],
+			isJsonFile: false,
 			cstyle:{
 				input:'',
 				ul: ''
@@ -98,8 +102,8 @@ export default {
 		selectItem :function(item){
 			this.onchange(item,this.selectedIndex,this.extra);
 
-			if(this["response-key"]){
-				this.$emit('update:refitem',item[this["response-key"]]);
+			if(this["responseKey"]){
+				this.$emit('update:refitem',item[this["responseKey"]]);
 
 			}else{
 				this.$emit('update:refitem', JSON.parse(JSON.stringify(item)));
@@ -152,11 +156,11 @@ export default {
 			if(this.value){
 				let scope = this;
 
-				if(this["response-key"]){
+				if(this["responseKey"]){
 
 					this.data.forEach(function(item,index){
 						
-						if(scope.value == item[scope["response-key"]]){
+						if(scope.value == item[scope["responseKey"]]){
 							scope.updateIndex(index);
 						}
 
@@ -171,6 +175,32 @@ export default {
 					});
 				}
 			}
+		},
+		localSearch: function(){
+			var indx = this.indexes;
+			var regex = new RegExp(this.filter,'i');
+			var scope = this;
+
+			this.originData = [];
+
+			this.data.forEach(function(item){
+				var res = false;
+
+				if(indx.length > 0){
+					for(var i in indx){
+						res = res || regex.test(item[indx[i]]);
+					}
+				}else{
+					
+					res = regex.test(item);
+
+				}
+
+				if(res){
+					scope.originData.push(item);
+				}
+			});
+			this.showData = (this.data.length > 0);
 		}
 
 	},
@@ -179,32 +209,30 @@ export default {
 	},
 	watch: {
 		filter: function(){
+			
 			if(!this.url){
-				var indx = this.indexes;
-				var regex = new RegExp(this.filter,'i');
-				var scope = this;
+				
+				this.loalSearch();
 
-				this.originData = [];
+			}else if(this.isJsonFile){
+				let scope = this;
+				let call = (this.method.toLowerCase() == 'post')?this.$http.post(this.url):this.$http.get(this.url);
+				
+				call.then(
+					response =>{
+						if(scope["idKey"]){
+							scope.data = response.body[scope["idKey"]];
 
-				this.data.forEach(function(item){
-					var res = false;
-
-					if(indx.length > 0){
-						for(i in indx){
-							res = res || regex.test(item[indx[i]]);
+						}else{
+							scope.data = response.body;
 						}
-					}else{
-						
-						res = regex.test(item);
-
+						scope.localSearch();
+						scope.showData = (scope.data.length > 0);
+					},
+					response =>{
+						scope.data = [];
 					}
-
-					if(res){
-						scope.originData.push(item);
-					}
-				});
-				this.showData = (this.data.length > 0);
-
+				);
 			}else{
 				if(this.filter && this.filter.length >= this.length){
 					var scope = this;
@@ -219,9 +247,9 @@ export default {
 							data.append(params[k].split("=")[0],params[k].split("=")[1]);
 						}
 
-						Vue.http.post(dest,data).then(
+						this.$http.post(dest,data).then(
 							response =>{
-								if(scope["id-key"]){
+								if(scope["idKey"]){
 									scope.originData = response.body[scope.key];
 
 								}else{
@@ -235,10 +263,10 @@ export default {
 						);
 
 					}else{
-						Vue.http.get(this.url+this.filter).then(
+						this.$http.get(this.url+this.filter).then(
 							response =>{
-								if(scope["id-key"]){
-									scope.originData = response.body[scope["id-key"]];
+								if(scope["idKey"]){
+									scope.originData = response.body[scope["idKey"]];
 
 								}else{
 									scope.originData = response.body;
@@ -305,8 +333,17 @@ export default {
 	mounted:function(){
 		// this.componentType = this.template;
 				
-		this.cstyle.input = this['class-input'];
-		this.cstyle.ul = this['class-ul'];
+		this.cstyle.input = this['classInput'];
+		this.cstyle.ul = this['classUl'];
+		this.isJsonFile = this['jsonFile'];
+
+		if(!this.data){
+			this.data = [];
+		}
+
+		if(!this.indexes){
+			this.indexes = [];
+		}
 
 		if(!this.url){
 			this.focusValue = true;
