@@ -8,7 +8,8 @@ new Vue({
   el: '#app',
   data:{
     isJson:true,
-    myIndex : ["name"]
+    myIndex : ["name"],
+    data: ["Andrea","Bruno","Edgar","Erick","Kirk","Sheydee","Cristian","Luis","Augusto"] 
   },
   methods:{
     label: function(item){

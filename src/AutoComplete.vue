@@ -129,23 +129,27 @@ export default {
 		},
 		upKey:function(){
 			if(this.originData){
+
 				if(this.selectedIndex == 0){
 					this.selectedIndex = (this.originData.length-1);
 				}else{
 					this.selectedIndex=this.selectedIndex-1;
 				}
-				// console.log(this.selectedIndex);
+				console.log(this.selectedIndex);
+				console.log(this.originData.length);
 			}
 
 		},
 		downKey:function(){
 			if(this.originData){
-				if(this.selectedIndex == (this.originData.length-1)){
+
+				if(this.selectedIndex >= (this.originData.length-1)){
 					this.selectedIndex = 0;
 				}else{
 					this.selectedIndex=this.selectedIndex+1;
 				}
-				// console.log(this.selectedIndex);
+				console.log(this.selectedIndex);
+				console.log(this.originData.length);
 			}
 		},
 		outClick:  function(e){
