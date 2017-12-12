@@ -214,7 +214,7 @@ export default {
 			
 			if(!this.url){
 				
-				this.loalSearch();
+				this.localSearch();
 
 			}else if(this.isJsonFile){
 				let scope = this;
