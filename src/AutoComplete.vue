@@ -135,8 +135,6 @@ export default {
 				}else{
 					this.selectedIndex=this.selectedIndex-1;
 				}
-				console.log(this.selectedIndex);
-				console.log(this.originData.length);
 			}
 
 		},
@@ -148,8 +146,6 @@ export default {
 				}else{
 					this.selectedIndex=this.selectedIndex+1;
 				}
-				console.log(this.selectedIndex);
-				console.log(this.originData.length);
 			}
 		},
 		outClick:  function(e){
