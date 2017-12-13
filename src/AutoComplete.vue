@@ -1,6 +1,6 @@
 <template>
 
-  <div @keydown.delete.stop style="position: relative;" v-click-outside="outClick">
+  <div @keydown.delete.stop style="position: relative;" v-click-outside="outClick" :class="cstyle.div">
     <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input + 'form-control'" @focus="focusValue = true; showData = true"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
     <ul :class="cstyle.ul + ' dropdown-ac'" style="display: block; max-height: 300px; height:auto; overflow-y:auto; width: 100%;" v-show="(showData && focusValue)">
       <li :class="{active: ($index==selectedIndex)}" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" >
@@ -75,6 +75,10 @@ export default {
 			type: String,
 			default : ''
 		},
+		'class-div':{
+			type: String,
+			default : ''
+		},
 		'json-file' : {
 			type: Boolean,
 			default: false
@@ -92,7 +96,8 @@ export default {
 			isJsonFile: false,
 			cstyle:{
 				input:'',
-				ul: ''
+				ul: '',
+				div: '',
 			}
 
 		}
@@ -347,6 +352,7 @@ export default {
 				
 		this.cstyle.input = this['classInput'];
 		this.cstyle.ul = this['classUl'];
+		this.cstyle.div = this['classDiv'];
 		this.isJsonFile = this['jsonFile'];
 
 		if(!this.data){
