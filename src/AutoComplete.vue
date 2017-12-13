@@ -3,7 +3,7 @@
   <div @keydown.delete.stop style="position: relative;" v-click-outside="outClick" :class="cstyle.div">
     <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input" @focus="focusValue = true; showData = true"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown="fromInput()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
     <ul :class="cstyle.ul" v-show="(showData && focusValue)">
-      <li :class="{active: ($index==selectedIndex)}" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" >
+      <li :class="formatedClass(($index==selectedIndex))" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" >
         <a @click="selectItem(item)" v-text="loadlabel(item,$index,extra)"></a>
       </li>
     </ul>
@@ -78,6 +78,10 @@ export default {
 		'class-div':{
 			type: String,
 			default : ''
+		},
+		'active-class':{
+			type: String,
+			default : 'active'
 		},
 		'json-file' : {
 			type: Boolean,
@@ -218,11 +222,14 @@ export default {
 				}
 			});
 			this.showData = (this.data.length > 0);
+		},
+		formatedClass : function(validation){
+			let jsonClass = {};
+
+			jsonClass[this['activeClass']] = validation;
+
+			return jsonClass;
 		}
-
-	},
-	computed:{
-
 	},
 	watch: {
 		filter: function(){
