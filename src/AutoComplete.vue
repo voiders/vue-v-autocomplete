@@ -1,8 +1,8 @@
 <template>
 
   <div @keydown.delete.stop style="position: relative;" v-click-outside="outClick" :class="cstyle.div">
-    <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input + 'form-control'" @focus="focusValue = true; showData = true"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
-    <ul :class="cstyle.ul + ' dropdown-ac'" style="display: block; max-height: 300px; height:auto; overflow-y:auto; width: 100%;" v-show="(showData && focusValue)">
+    <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input" @focus="focusValue = true; showData = true"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown="fromInput()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
+    <ul :class="cstyle.ul" v-show="(showData && focusValue)">
       <li :class="{active: ($index==selectedIndex)}" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" >
         <a @click="selectItem(item)" v-text="loadlabel(item,$index,extra)"></a>
       </li>
@@ -73,7 +73,7 @@ export default {
 		},
 		'class-ul':{
 			type: String,
-			default : ''
+			default : 'dropdown-ac'
 		},
 		'class-div':{
 			type: String,
@@ -94,6 +94,7 @@ export default {
 			itemSelected: {},
 			originData:[],
 			isJsonFile: false,
+			readyToSearch:true,
 			cstyle:{
 				input:'',
 				ul: '',
@@ -103,6 +104,13 @@ export default {
 		}
 	},
 	methods :{
+		fromControl : function(){
+			this.readyToSearch = false;
+			this.showData = false;
+		},
+		fromInput : function(){
+			this.readyToSearch = true;
+		},
 		hoverItem : function(index){
 			this.selectedIndex = index;
 		},
@@ -119,13 +127,15 @@ export default {
 
 			this.filter = this.loadlabel(item,this.extra);
 			this.itemSelected = item;
-			this.focusValue = false;
+			this.fromControl();
+			
 		},
 		selectItemByIndex : function(){
 			if(this.originData){
 
 				this.selectItem(this.originData[this.selectedIndex]);
 			}
+			
 		},
 		updateIndex: function(index){
 			this.selectedIndex = index;
@@ -216,92 +226,94 @@ export default {
 	},
 	watch: {
 		filter: function(){
-			
-			if(!this.url){
-				
-				this.localSearch();
+			console.log('this.readyToSearch',this.readyToSearch);
+			if(this.readyToSearch){
+				if(!this.url){
+					
+					this.localSearch();
 
-			}else if(this.isJsonFile){
-				let scope = this;
-				let call = (this.method.toLowerCase() == 'post')?this.$http.post(this.url):this.$http.get(this.url);
-				
-				call.then(
-					response =>{
-						if(scope["idKey"]){
-							if(Object.prototype.toString.call(response.body[scope["idKey"]]) == '[object Array]'){
-								scope.data = response.body[scope["idKey"]];
+				}else if(this.isJsonFile){
+					let scope = this;
+					let call = (this.method.toLowerCase() == 'post')?this.$http.post(this.url):this.$http.get(this.url);
+					
+					call.then(
+						response =>{
+							if(scope["idKey"]){
+								if(Object.prototype.toString.call(response.body[scope["idKey"]]) == '[object Array]'){
+									scope.data = response.body[scope["idKey"]];
+								}else{
+									scope.data = JSON.parse(response.body[scope["idKey"]]);
+								}
+								
 							}else{
-								scope.data = JSON.parse(response.body[scope["idKey"]]);
+								if(Object.prototype.toString.call(response.body) == '[object Array]'){
+									scope.data = response.body;
+								}else{
+									scope.data = JSON.parse(response.body);
+								}
+
 							}
 							
-						}else{
-							if(Object.prototype.toString.call(response.body) == '[object Array]'){
-								scope.data = response.body;
-							}else{
-								scope.data = JSON.parse(response.body);
+							scope.localSearch();
+							scope.showData = (scope.data.length > 0);
+						},
+						response =>{
+							scope.data = [];
+						}
+					);
+				}else{
+					if(this.filter && this.filter.length >= this.length){
+						var scope = this;
+
+						if (this.method.toLowerCase() == 'post') {
+							var dest = this.url.split("?")[0];
+							var params = this.url.split("?")[1].split("&");
+							var data = new FormData();
+
+							for(k in params){
+
+								data.append(params[k].split("=")[0],params[k].split("=")[1]);
 							}
 
-						}
-						
-						scope.localSearch();
-						scope.showData = (scope.data.length > 0);
-					},
-					response =>{
-						scope.data = [];
-					}
-				);
-			}else{
-				if(this.filter && this.filter.length >= this.length){
-					var scope = this;
+							this.$http.post(dest,data).then(
+								response =>{
+									if(scope["idKey"]){
+										scope.originData = response.body[scope.key];
 
-					if (this.method.toLowerCase() == 'post') {
-						var dest = this.url.split("?")[0];
-						var params = this.url.split("?")[1].split("&");
-						var data = new FormData();
-
-						for(k in params){
-
-							data.append(params[k].split("=")[0],params[k].split("=")[1]);
-						}
-
-						this.$http.post(dest,data).then(
-							response =>{
-								if(scope["idKey"]){
-									scope.originData = response.body[scope.key];
-
-								}else{
-									scope.originData = response.body;
+									}else{
+										scope.originData = response.body;
+									}
+									scope.showData = (scope.originData.length > 0);
+								},
+								response =>{
+									scope.data = [];
 								}
-								scope.showData = (scope.originData.length > 0);
-							},
-							response =>{
-								scope.data = [];
-							}
-						);
+							);
+
+						}else{
+							this.$http.get(this.url+this.filter).then(
+								response =>{
+									if(scope["idKey"]){
+										scope.originData = response.body[scope["idKey"]];
+
+									}else{
+										scope.originData = response.body;
+									}
+									scope.showData = (scope.originData.length > 0);
+								},
+								response =>{
+									scope.data = [];
+								}
+							);
+						}
+						this.showData = (this.originData.length > 0);
 
 					}else{
-						this.$http.get(this.url+this.filter).then(
-							response =>{
-								if(scope["idKey"]){
-									scope.originData = response.body[scope["idKey"]];
-
-								}else{
-									scope.originData = response.body;
-								}
-								scope.showData = (scope.originData.length > 0);
-							},
-							response =>{
-								scope.data = [];
-							}
-						);
+						this.originData = [];
+						this.showData = false;
 					}
-					this.showData = (this.originData.length > 0);
 
-				}else{
-					this.originData = [];
-					this.showData = false;
 				}
-
 			}
 		}
 		
@@ -388,6 +400,11 @@ export default {
 	border-bottom: 1px solid #000000;
 	border-left: 1px solid #000000;
 	border-right: 1px solid #000000;
+	display: block; 
+	max-height: 300px; 
+	height:auto; 
+	overflow-y:auto; 
+	width: 100%;
 }
 .dropdown-ac li{
 	margin-top:5px;
