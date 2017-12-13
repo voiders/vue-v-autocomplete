@@ -3,8 +3,8 @@
   <div @keydown.delete.stop style="position: relative;" v-click-outside="outClick" :class="cstyle.div">
     <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input" @focus="focusValue = true; showData = true"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown="fromInput()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
     <ul :class="cstyle.ul" v-show="(showData && focusValue)">
-      <li :class="formatedClass(($index==selectedIndex))" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" >
-        <a @click="selectItem(item)" v-text="loadlabel(item,$index,extra)"></a>
+      <li :class="liClass(($index==selectedIndex))" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" >
+        <a :class="aClass(($index==selectedIndex))"  @click="selectItem(item)" v-text="loadlabel(item,$index,extra)"></a>
       </li>
     </ul>
   </div>
@@ -79,7 +79,11 @@ export default {
 			type: String,
 			default : ''
 		},
-		'active-class':{
+		'class-a-active':{
+			type: String,
+			default : 'active'
+		},
+		'class-li-active':{
 			type: String,
 			default : 'active'
 		},
@@ -223,10 +227,17 @@ export default {
 			});
 			this.showData = (this.data.length > 0);
 		},
-		formatedClass : function(validation){
+		liClass : function(validation){
 			let jsonClass = {};
 
-			jsonClass[this['activeClass']] = validation;
+			jsonClass[this['classLiActive']] = validation;
+
+			return jsonClass;
+		},
+		aClass : function(validation){
+			let jsonClass = {};
+
+			jsonClass[this['classAActive']] = validation;
 
 			return jsonClass;
 		}
