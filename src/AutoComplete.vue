@@ -2,16 +2,26 @@
 
   <div @keydown.delete.stop style="position: relative;" v-click-outside="outClick" :class="cstyle.div">
     <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input" @focus="focusValue = true; showData = true"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown="fromInput()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
-    <ul :class="cstyle.ul" v-show="(showData && focusValue)">
-      <li :class="liClass(($index==selectedIndex))" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" >
-        <a :class="aClass(($index==selectedIndex))"  @click="selectItem(item)" v-text="loadlabel(item,$index,extra)"></a>
-      </li>
-    </ul>
+    <component :is="component" 
+			:ul-style.sync="cstyle.ul" 
+			:show-data.sync="showData" 
+			:focus-value.sync="focusValue"
+			:origin-data.sync="originData"
+			:hover-item.sync="hoverItem"
+			:li-class.sync="liClass"
+			:a-class.sync="aClass"
+			:select-item.sync="selectItem"
+			:load-label.sync="loadlabel"
+			:extra.sync="extra"
+			:selected-index.sync="selectedIndex"
+			></component>
   </div>
 
 </template>
 
 <script>
+import UlList from './DefaultComponent.vue'
+
 export default {
   name: 'vue-v-autocomplete',
 	props:{
@@ -90,6 +100,10 @@ export default {
 		'json-file' : {
 			type: Boolean,
 			default: false
+		},
+		'component':{
+			type: String,
+			default: 'ul-list'
 		}
 	},
 	data: function(){
@@ -120,6 +134,7 @@ export default {
 			this.readyToSearch = true;
 		},
 		hoverItem : function(index){
+			
 			this.selectedIndex = index;
 		},
 		selectItem :function(item){
@@ -404,6 +419,9 @@ export default {
 			this.showData = true;
 			this.loadFromValue();
 		}
+	},
+	components : {
+		'ul-list' : UlList
 	}
 }
 </script>
