@@ -3,6 +3,7 @@ var webpack = require('webpack')
 
 module.exports = {
   entry: {
+    'auto-complete' : './src/AutoComplete.vue',
     test: './src/test.js'
   },
   output: {

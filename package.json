@@ -1,7 +1,7 @@
 {
   "name": "vue-v-autocomplete",
   "description": "component",
-  "version": "1.2.3",
+  "version": "1.2.6",
   "author": "@EdgarXolop",
   "license": "MIT",
   "main": "./src/AutoComplete.vue",
@@ -37,6 +37,7 @@
     "webpack-dev-server": "^2.9.1"
   },
   "files": [
+    "dist/auto-complete.js",
     "src/AutoComplete.vue",
     "src/DefaultComponent.vue",
     "LICENSE",
