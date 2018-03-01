@@ -1,7 +1,7 @@
 <template>
 
   <div @keydown.delete.stop style="position: relative;" v-click-outside="outClick" :class="cstyle.div">
-    <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input" @focus="focusValue = true; showData = true"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown="fromInput()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
+    <input type="text" ref="inputfilter" v-autofocus="focus" placeholder="Opciones" v-model="filter" :class="cstyle.input" @focus="onFocus"  @keydown.up="upKey()" @keydown.down="downKey()" @keydown="fromInput()" @keydown.enter.prevent="selectItemByIndex()" @keydown.tab="selectItemByIndex()">
     <component :is="component" 
 			:ul-style.sync="cstyle.ul" 
 			:show-data.sync="showData" 
@@ -137,6 +137,10 @@ export default {
 			
 			this.selectedIndex = index;
 		},
+		onFocus: function(){
+			this.focusValue = true; 
+			this.showData = (this.originData.length>0);
+		},
 		selectItem :function(item){
 			this.onchange(item,this.selectedIndex,this.extra);
 
@@ -259,7 +263,7 @@ export default {
 	},
 	watch: {
 		filter: function(){
-			console.log('this.readyToSearch',this.readyToSearch);
+			
 			if(this.readyToSearch){
 				if(!this.url){
 					
@@ -396,7 +400,7 @@ export default {
 		// this.componentType = this.template;
 				
 		this.cstyle.input = this['classInput'];
-		this.cstyle.ul = this['classUl'];
+		this.cstyle.ul = 'component-config '+this['classUl'];
 		this.cstyle.div = this['classDiv'];
 		this.isJsonFile = this['jsonFile'];
 
@@ -416,7 +420,7 @@ export default {
 		if(this.data){
 			this.originData = this.data;
 			this.focusValue = true;
-			this.showData = true;
+			this.showData = (this.originData.length > 0);
 			this.loadFromValue();
 		}
 	},
@@ -450,5 +454,10 @@ export default {
 .dropdown-ac li.active{
 	background: #3273DC;
 	color: #FFFFFF;
+}
+.component-config{
+	position: absolute;
+	z-index: 1;
+	box-shadow: 0px 10px 20px 5px #E0E0E0
 }
 </style>

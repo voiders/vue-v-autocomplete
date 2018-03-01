@@ -1,5 +1,5 @@
 <template>
-  <ul :class="ulStyle" v-show="(showData && focusValue)">
+  <ul :class="ulStyle + custom" v-show="(showData && focusValue)">
       <li :class="liClass(($index==selectedIndex))" v-for="(item,$index) in originData" @mouseover="hoverItem($index)" :key="$index">
         <a :class="aClass(($index==selectedIndex))"  @click="selectItem(item)" v-text="loadLabel(item,$index,extra)"></a>
       </li>
@@ -59,9 +59,16 @@ export default {
   },
   data (){
       return{
-          
+        custom : ' ul-custom' 
       }
   }
 }
 </script>
 
+<style>
+.ul-custom{
+    width: 100%;
+    background: white;
+}
+
+</style>
