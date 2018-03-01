@@ -291,6 +291,7 @@ export default {
 
 							}
 							
+							scope.$emit('update:data',scope.data);
 							scope.localSearch();
 							scope.showData = (scope.data.length > 0);
 						},
