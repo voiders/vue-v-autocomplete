@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
-import AutoComplete from './main.js'
+import AutoComplete from './AutoComplete.vue'
 
 Vue.use(VueResource);
-Vue.use(AutoComplete);
+Vue.component('vue-v-autocomplete',AutoComplete);
 
 new Vue({
   el: '#app',
