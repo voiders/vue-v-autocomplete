@@ -218,6 +218,10 @@ export default {
 
 					});
 				}
+
+				if(this.data.length == 0){
+					this.selectItem(this.value);
+				}
 			}
 		},
 		localSearch: function(){
